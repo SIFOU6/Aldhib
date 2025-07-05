@@ -1,0 +1,10 @@
+{
+  "playerCount": 8,
+  "roles": [
+    { "name": "الذئب", "emoji": "🐺", "color": "#e53e3e", "team": "evil", "count": 2 },
+    { "name": "الشوافة", "emoji": "🔮", "color": "#805ad5", "team": "good", "count": 1 },
+    { "name": "القروي", "emoji": "🧑‍🌾", "color": "#319795", "team": "good", "count": 5 }
+  ],
+  "players": [],
+  "gameHistory": []
+}
