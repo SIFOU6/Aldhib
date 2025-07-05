@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة المستذئب</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+            text-align: right;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page {
+            display: none;
+            flex: 1;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .page.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        h2 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            text-align: center;
+            direction: ltr;
+        }
+
+        input[type="text"] {
+            text-align: right;
+            direction: rtl;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .role-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 3px solid;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .role-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .role-emoji {
+            font-size: 2em;
+        }
+
+        .role-name {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .role-count {
+            background: #f7fafc;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .role-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 18px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .role-assignment {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: 3px solid;
+        }
+
+        .role-assignment .role-emoji {
+            font-size: 4em;
+            margin-bottom: 10px;
+        }
+
+        .role-assignment .role-name {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .summary-card {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            flex: 1;
+            margin: 0 5px;
+        }
+
+        .wolves-section {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .player-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .player-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-right: 5px solid;
+        }
+
+        .game-history {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 400px;
+            direction: rtl;
+        }
+
+        .close {
+            color: #aaa;
+            float: left;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border: 3px solid #333;
+            transform: scale(1.1);
+        }
+
+        .team-selector {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .team-option {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .team-option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        #rolesCounter {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .top-section {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- الصفحة الأولى: الترحيب -->
+        <div class="page active" id="welcomePage">
+            <h1>🐺 لعبة المستذئب</h1>
+            <div class="input-group">
+                <label for="playerCount">كم عدد اللاعبين؟</label>
+                <input type="number" id="playerCount" min="4" max="20" placeholder="أدخل عدد اللاعبين">
+            </div>
+            <button class="btn-primary" onclick="goToRolesPage()">التالي</button>
+            <button class="btn-secondary" onclick="showGameHistory()">📖 سجل الألعاب</button>
+        </div>
+
+        <!-- الصفحة الثانية: إعداد الأدوار -->
+        <div class="page" id="rolesPage">
+            <h2>إعداد الأدوار</h2>
+            <div class="top-section">
+                <div id="rolesCounter">العدد المختار: 0 من 0</div>
+                <div id="selectedRolesList"></div>
+            </div>
+            <div id="rolesList"></div>
+            <button class="btn-secondary" onclick="showAddRoleModal()">➕ إضافة دور جديد</button>
+            <button class="btn-secondary" onclick="goToWelcomePage()">رجوع</button>
+            <button class="btn-primary" onclick="goToPlayersPage()">التالي</button>
+        </div>
+
+        <!-- الصفحة الثالثة: إدخال أسماء اللاعبين -->
+        <div class="page" id="playersPage">
+            <h2>إدخال أسماء اللاعبين</h2>
+            <div class="input-group">
+                <label for="playerName">اسم اللاعب <span id="currentPlayerNum">1</span>:</label>
+                <input type="text" id="playerName" placeholder="أدخل اسم اللاعب">
+            </div>
+            <button class="btn-primary" onclick="assignRole()">🎲 ما هو دوره؟</button>
+            <div id="roleAssignment" class="hidden"></div>
+            <button class="btn-secondary hidden" id="confirmRole" onclick="confirmRole()">تأكيد</button>
+            <button class="btn-secondary" onclick="goToRolesPage()">رجوع</button>
+        </div>
+
+        <!-- الصفحة الرابعة: ملخص اللعبة -->
+        <div class="page" id="summaryPage">
+            <h2>ملخص اللعبة</h2>
+            <div class="stats">
+                <div class="stat-item">
+                    <div style="font-size: 2em; color: #48bb78;">😇</div>
+                    <div id="goodCount">0</div>
+                    <div>الأخيار</div>
+                </div>
+                <div class="stat-item">
+                    <div style="font-size: 2em; color: #e53e3e;">😈</div>
+                    <div id="evilCount">0</div>
+                    <div>الأشرار</div>
+                </div>
+            </div>
+            <div id="wolvesSection" class="wolves-section hidden">
+                <h3>🐺 الذئاب</h3>
+                <div id="wolvesList"></div>
+            </div>
+            <div class="player-list" id="playersList"></div>
+            <button class="btn-primary" onclick="newGame()">لعبة جديدة</button>
+            <button class="btn-secondary" onclick="goToWelcomePage()">الصفحة الرئيسية</button>
+        </div>
+
+        <!-- صفحة سجل الألعاب -->
+        <div class="page" id="historyPage">
+            <h2>📖 سجل الألعاب</h2>
+            <div class="game-history" id="gameHistory"></div>
+            <button class="btn-secondary" onclick="clearHistory()">مسح السجل</button>
+            <button class="btn-secondary" onclick="goToWelcomePage()">رجوع</button>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة دور -->
+    <div id="addRoleModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>إضافة دور جديد</h3>
+            <div class="input-group">
+                <label>اسم الدور:</label>
+                <input type="text" id="newRoleName" placeholder="أدخل اسم الدور">
+            </div>
+            <div class="input-group">
+                <label>الإيموجي:</label>
+                <input type="text" id="newRoleEmoji" placeholder="🎭" maxlength="2">
+            </div>
+            <div class="input-group">
+                <label>الفريق:</label>
+                <div class="team-selector">
+                    <div class="team-option" id="goodTeam" onclick="selectTeam('good')">الأخيار</div>
+                    <div class="team-option" id="evilTeam" onclick="selectTeam('evil')">الأشرار</div>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>اللون:</label>
+                <div class="color-picker">
+                    <div class="color-option" style="background: #3182ce" onclick="selectColor('#3182ce')"></div>
+                    <div class="color-option" style="background: #38a169" onclick="selectColor('#38a169')"></div>
+                    <div class="color-option" style="background: #d69e2e" onclick="selectColor('#d69e2e')"></div>
+                    <div class="color-option" style="background: #e53e3e" onclick="selectColor('#e53e3e')"></div>
+                    <div class="color-option" style="background: #805ad5" onclick="selectColor('#805ad5')"></div>
+                    <div class="color-option" style="background: #dd6b20" onclick="selectColor('#dd6b20')"></div>
+                    <div class="color-option" style="background: #319795" onclick="selectColor('#319795')"></div>
+                    <div class="color-option" style="background: #4a5568" onclick="selectColor('#4a5568')"></div>
+                </div>
+            </div>
+            <button class="btn-primary" onclick="addNewRole()">حفظ الدور</button>
+        </div>
+    </div>
+
+    <!-- نافذة تعديل دور -->
+    <div id="editRoleModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>تعديل الدور</h3>
+            <div class="input-group">
+                <label>اسم الدور:</label>
+                <input type="text" id="editRoleName">
+            </div>
+            <div class="input-group">
+                <label>الإيموجي:</label>
+                <input type="text" id="editRoleEmoji" maxlength="2">
+            </div>
+            <div class="input-group">
+                <label>الفريق:</label>
+                <div class="team-selector">
+                    <div class="team-option" id="editGoodTeam" onclick="selectEditTeam('good')">الأخيار</div>
+                    <div class="team-option" id="editEvilTeam" onclick="selectEditTeam('evil')">الأشرار</div>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>اللون:</label>
+                <div class="color-picker">
+                    <div class="color-option" style="background: #3182ce" onclick="selectEditColor('#3182ce')"></div>
+                    <div class="color-option" style="background: #38a169" onclick="selectEditColor('#38a169')"></div>
+                    <div class="color-option" style="background: #d69e2e" onclick="selectEditColor('#d69e2e')"></div>
+                    <div class="color-option" style="background: #e53e3e" onclick="selectEditColor('#e53e3e')"></div>
+                    <div class="color-option" style="background: #805ad5" onclick="selectEditColor('#805ad5')"></div>
+                    <div class="color-option" style="background: #dd6b20" onclick="selectEditColor('#dd6b20')"></div>
+                    <div class="color-option" style="background: #319795" onclick="selectEditColor('#319795')"></div>
+                    <div class="color-option" style="background: #4a5568" onclick="selectEditColor('#4a5568')"></div>
+                </div>
+            </div>
+            <button class="btn-primary" onclick="saveEditedRole()">حفظ التعديلات</button>
+        </div>
+    </div>
+
+    <script>
+        // البيانات الأساسية
+        let gameData = {
+            playerCount: 0,
+            roles: [
+                { name: 'الذئب', emoji: '🐺', color: '#e53e3e', team: 'evil', count: 0 },
+                { name: 'الشوافة', emoji: '🔮', color: '#805ad5', team: 'good', count: 0 },
+                { name: 'السحارة', emoji: '🪄', color: '#3182ce', team: 'good', count: 0 },
+                { name: 'الغراب', emoji: '🐦‍⬛', color: '#4a5568', team: 'evil', count: 0 },
+                { name: 'الصياد', emoji: '🏹', color: '#d69e2e', team: 'good', count: 0 },
+                { name: 'المنقذ', emoji: '🧑‍⚕️', color: '#38a169', team: 'good', count: 0 },
+                { name: 'القروي', emoji: '🧑‍🌾', color: '#319795', team: 'good', count: 0 }
+            ],
+            players: [],
+            gameHistory: []
+        };
+
+        let currentPlayer = 0;
+        let availableRoles = [];
+        let selectedTeam = 'good';
+        let selectedColor = '#3182ce';
+        let editingRoleIndex = -1;
+
+        // تحميل البيانات المحفوظة
+        function loadData() {
+            const saved = localStorage.getItem('loupGarouData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                gameData.roles = data.roles || gameData.roles;
+                gameData.gameHistory = data.gameHistory || [];
+            }
+        }
+
+        // حفظ البيانات
+        function saveData() {
+            localStorage.setItem('loupGarouData', JSON.stringify({
+                roles: gameData.roles,
+                gameHistory: gameData.gameHistory
+            }));
+        }
+
+        // إظهار الصفحة
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // الانتقال إلى صفحة الأدوار
+        function goToRolesPage() {
+            const count = parseInt(document.getElementById('playerCount').value);
+            if (!count || count < 4 || count > 20) {
+                alert('يرجى إدخال عدد اللاعبين بين 4 و 20');
+                return;
+            }
+            gameData.playerCount = count;
+            gameData.roles.forEach(role => role.count = 0);
+            displayRoles();
+            showPage('rolesPage');
+        }
+
+        // الانتقال إلى صفحة اللاعبين
+        function goToPlayersPage() {
+            const totalSelected = gameData.roles.reduce((sum, role) => sum + role.count, 0);
+            if (totalSelected !== gameData.playerCount) {
+                alert(`يجب أن يكون مجموع الأدوار مساوياً لعدد اللاعبين (${gameData.playerCount})`);
+                return;
+            }
+            
+            // إعداد الأدوار المتاحة
+            availableRoles = [];
+            gameData.roles.forEach(role => {
+                for (let i = 0; i < role.count; i++) {
+                    availableRoles.push({ ...role });
+                }
+            });
+            
+            gameData.players = [];
+            currentPlayer = 0;
+            updatePlayerCounter();
+            showPage('playersPage');
+        }
+
+        // الانتقال إلى الصفحة الرئيسية
+        function goToWelcomePage() {
+            showPage('welcomePage');
+        }
+
+        // عرض الأدوار
+        function displayRoles() {
+            const rolesList = document.getElementById('rolesList');
+            rolesList.innerHTML = '';
+            
+            gameData.roles.forEach((role, index) => {
+                const roleCard = document.createElement('div');
+                roleCard.className = 'role-card';
+                roleCard.style.borderColor = role.color;
+                
+                roleCard.innerHTML = `
+                    <div class="role-info">
+                        <div class="role-emoji">${role.emoji}</div>
+                        <div class="role-name">${role.name}</div>
+                        <div class="role-count">${role.count}</div>
+                    </div>
+                    <div class="role-controls">
+                        <button class="btn-small btn-secondary" onclick="decreaseRole(${index})">➖</button>
+                        <button class="btn-small btn-primary" onclick="increaseRole(${index})">➕</button>
+                        <button class="btn-small btn-secondary" onclick="editRole(${index})">✏️</button>
+                    </div>
+                `;
+                
+                rolesList.appendChild(roleCard);
+            });
+            
+            updateRolesCounter();
+        }
+
+        // تحديث عداد الأدوار
+        function updateRolesCounter() {
+            const totalSelected = gameData.roles.reduce((sum, role) => sum + role.count, 0);
+            document.getElementById('rolesCounter').textContent = `العدد المختار: ${totalSelected} من ${gameData.playerCount}`;
+            
+            const selectedRoles = gameData.roles.filter(role => role.count > 0);
+            const selectedList = document.getElementById('selectedRolesList');
+            selectedList.innerHTML = selectedRoles.map(role => 
+                `<span style="color: ${role.color};">${role.emoji} ${role.name} (${role.count})</span>`
+            ).join(' - ');
+        }
+
+        // زيادة الدور
+        function increaseRole(index) {
+            const totalSelected = gameData.roles.reduce((sum, role) => sum + role.count, 0);
+            if (totalSelected < gameData.playerCount) {
+                gameData.roles[index].count++;
+                displayRoles();
+            }
+        }
+
+        // تقليل الدور
+        function decreaseRole(index) {
+            if (gameData.roles[index].count > 0) {
+                gameData.roles[index].count--;
+                displayRoles();
+            }
+        }
+
+        // تعديل الدور
+        function editRole(index) {
+            editingRoleIndex = index;
+            const role = gameData.roles[index];
+            document.getElementById('editRoleName').value = role.name;
+            document.getElementById('editRoleEmoji').value = role.emoji;
+            selectEditTeam(role.team);
+            selectEditColor(role.color);
+            document.getElementById('editRoleModal').style.display = 'block';
+        }
+
+        // حفظ التعديلات
+        function saveEditedRole() {
+            const name = document.getElementById('editRoleName').value.trim();
+            const emoji = document.getElementById('editRoleEmoji').value.trim();
+            
+            if (!name || !emoji) {
+                alert('يرجى ملء جميع الحقول');
+                return;
+            }
+            
+            gameData.roles[editingRoleIndex] = {
+                ...gameData.roles[editingRoleIndex],
+                name: name,
+                emoji: emoji,
+                team: selectedTeam,
+                color: selectedColor
+            };
+            
+            displayRoles();
+            closeModal();
+            saveData();
+        }
+
+        // إظهار نافذة إضافة دور
+        function showAddRoleModal() {
+            document.getElementById('newRoleName').value = '';
+            document.getElementById('newRoleEmoji').value = '';
+            selectTeam('good');
+            selectColor('#3182ce');
+            document.getElementById('addRoleModal').style.display = 'block';
+        }
+
+        // إضافة دور جديد
+        function addNewRole() {
+            const name = document.getElementById('newRoleName').value.trim();
+            const emoji = document.getElementById('newRoleEmoji').value.trim();
+            
+            if (!name || !emoji) {
+                alert('يرجى ملء جميع الحقول');
+                return;
+            }
+            
+            gameData.roles.push({
+                name: name,
+                emoji: emoji,
+                color: selectedColor,
+                team: selectedTeam,
+                count: 0
+            });
+            
+            displayRoles();
+            closeModal();
+            saveData();
+        }
+
+        // اختيار الفريق
+        function selectTeam(team) {
+            selectedTeam = team;
+            document.getElementById('goodTeam').classList.remove('selected');
+            document.getElementById('evilTeam').classList.remove('selected');
+            document.getElementById(team + 'Team').classList.add('selected');
+        }
+
+        // اختيار الفريق للتعديل
+        function selectEditTeam(team) {
+            selectedTeam = team;
+            document.getElementById('editGoodTeam').classList.remove('selected');
+            document.getElementById('editEvilTeam').classList.remove('selected');
+            document.getElementById('edit' + team.charAt(0).toUpperCase() + team.slice(1) + 'Team').classList.add('selected');
+        }
+
+        // اختيار اللون
+        function selectColor(color) {
+            selectedColor = color;
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        // اختيار اللون للتعديل
+        function selectEditColor(color) {
+            selectedColor = color;
+            document.querySelectorAll('#editRoleModal .color-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        // إغلاق النافذة
+        function closeModal() {
+            document.getElementById('addRoleModal').style.display = 'none';
+            document.getElementById('editRoleModal').style.display = 'none';
+        }
+
+        // تحديث عداد اللاعبين
+        function updatePlayerCounter() {
+            document.getElementById('currentPlayerNum').textContent = currentPlayer + 1;
+        }
+
+        // تعيين الدور
+        function assignRole() {
+            const playerName = document.getElementById('playerName').value.trim();
+            if (!playerName) {
+                alert('يرجى إدخال اسم اللاعب');
+                return;
+            }
+            
+            const randomIndex = Math.floor(Math.random() * availableRoles.length);
+            const assignedRole = availableRoles[randomIndex];
+            
+            const roleAssignment = document.getElementById('roleAssignment');
+            roleAssignment.className = 'role-assignment';
+            roleAssignment.style.borderColor = assignedRole.color;
+            roleAssignment.innerHTML = `
+                <div class="role-emoji">${assignedRole.emoji}</div>
+                <div class="role-name">${assignedRole.name}</div>
+                <div style="color: ${assignedRole.color}; font-size: 1.2em; margin-top: 10px;">
+                    ${playerName}
+                </div>
+            `;
+            
+            roleAssignment.classList.remove('hidden');
+            document.getElementById('confirmRole').classList.remove('hidden');
+            
+            // حفظ البيانات مؤقتاً
+            gameData.tempPlayer = {
+                name: playerName,
+                role: assignedRole,
+                roleIndex: randomIndex
+            };
+        }
+
+        // تأكيد الدور
+        function confirmRole() {
+            gameData.players.push({
+                name: gameData.tempPlayer.name,
+                role: gameData.tempPlayer.role
+            });
+            
+            // إزالة الدور من القائمة المتاحة
+            availableRoles.splice(gameData.tempPlayer.roleIndex, 1);
+            
+            currentPlayer++;
+            
+            // إخفاء المعلومات وإعادة تعيين النموذج
+            document.getElementById('roleAssignment').classList.add('hidden');
+            document.getElementById('confirmRole').classList.add('hidden');
+            document.getElementById('playerName').value = '';
+            
+            if (currentPlayer >= gameData.playerCount) {
+                // انتهاء اللعبة، الانتقال للملخص
+                showGameSummary();
+            } else {
+                updatePlayerCounter();
+            }
+        }
+
+        // عرض ملخص اللعبة
+        function showGameSummary() {
+            const goodPlayers = gameData.players.filter(p => p.role.team === 'good');
+            const evilPlayers = gameData.players.filter(p => p.role.team === 'evil');
+            const wolves = gameData.players.filter(p => p.role.name === 'الذئب');
+            
+            document.getElementById('goodCount').textContent = goodPlayers.length;
+            document.getElementById('evilCount').textContent = evilPlayers.length;
+            
+            // عرض الذئاب
+            if (wolves.length > 0) {
+                document.getElementById('wolvesSection').classList.remove('hidden');
+                document.getElementById('wolvesList').innerHTML = wolves.map(wolf => 
+                    `<div style="margin: 5px 0; font-size: 1.2em;">${wolf.role.emoji} ${wolf.name}</div>`
+                ).join('');
+            }
+            
+            // عرض جميع اللاعبين
+            const playersList = document.getElementById('playersList');
+            playersList.innerHTML = gameData.players.map(player => `
+                <div class="player-item" style="border-right-color: ${player.role.color};">
+                    <div class="role-emoji">${player.role.emoji}</div>
+                    <div>
+                        <div class="role-name">${player.name}</div>
+                        <div style="color: ${player.role.color}; font-size: 0.9em;">${player.role.name}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // حفظ اللعبة في السجل
+            saveGameToHistory();
+            
+            showPage('summaryPage');
+        }
+
+        // حفظ اللعبة في السجل
+        function saveGameToHistory() {
+            const gameRecord = {
+                date: new Date().toLocaleString('ar-SA'),
+                playerCount: gameData.playerCount,
+                players: gameData.players.map(p => ({
+                    name: p.name,
+                    role: p.role.name,
+                    emoji: p.role.emoji,
+                    team: p.role.team
+                })),
+                roles: gameData.roles.filter(r => r.count > 0).map(r => ({
+                    name: r.name,
+                    emoji: r.emoji,
+                    count: r.count
+                }))
+            };
+            
+            gameData.gameHistory.unshift(gameRecord);
+            if (gameData.gameHistory.length > 10) {
+                gameData.gameHistory = gameData.gameHistory.slice(0, 10);
+            }
+            
+            saveData();
+        }
+
+        // عرض سجل الألعاب
+        function showGameHistory() {
+            const historyDiv = document.getElementById('gameHistory');
+            
+            if (gameData.gameHistory.length === 0) {
+                historyDiv.innerHTML = '<div class="history-item">لا توجد ألعاب محفوظة</div>';
+            } else {
+                historyDiv.innerHTML = gameData.gameHistory.map((game, index) => `
+                    <div class="history-item">
+                        <div style="font-weight: bold; margin-bottom: 10px;">
+                            ${game.date} - ${game.playerCount} لاعبين
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <strong>الأدوار:</strong> ${game.roles.map(r => `${r.emoji} ${r.name} (${r.count})`).join(', ')}
+                        </div>
+                        <div style="font-size: 0.9em;">
+                            <strong>اللاعبون:</strong><br>
+                            ${game.players.map(p => `${p.emoji} ${p.name} - ${p.role}`).join('<br>')}
+                        </div>
+                        <button class="btn-secondary" style="margin-top: 10px; width: auto; padding: 5px 15px;" onclick="deleteGame(${index})">حذف</button>
+                    </div>
+                `).join('');
+            }
+            
+            showPage('historyPage');
+        }
+
+        // حذف لعبة من السجل
+        function deleteGame(index) {
+            if (confirm('هل أنت متأكد من حذف هذه اللعبة؟')) {
+                gameData.gameHistory.splice(index, 1);
+                saveData();
+                showGameHistory();
+            }
+        }
+
+        // مسح السجل
+        function clearHistory() {
+            if (confirm('هل أنت متأكد من مسح جميع الألعاب؟')) {
+                gameData.gameHistory = [];
+                saveData();
+                showGameHistory();
+            }
+        }
+
+        // لعبة جديدة
+        function newGame() {
+            gameData.players = [];
+            gameData.roles.forEach(role => role.count = 0);
+            currentPlayer = 0;
+            document.getElementById('playerCount').value = '';
+            goToWelcomePage();
+        }
+
+        // تحميل البيانات عند بدء التطبيق
+        window.onload = function() {
+            loadData();
+            displayRoles();
+        };
+
+        // إغلاق النوافذ عند الضغط خارجها
+        window.onclick = function(event) {
+            const addModal = document.getElementById('addRoleModal');
+            const editModal = document.getElementById('editRoleModal');
+            if (event.target === addModal || event.target === editModal) {
+                closeModal();
+            }
+        };
+    </script>
+</body>
+</html>
